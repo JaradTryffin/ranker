@@ -5,14 +5,21 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
-  WsException,
 } from '@nestjs/websockets';
-import { Logger, UsePipes, ValidationPipe } from '@nestjs/common';
+import {
+  BadRequestException,
+  Logger,
+  UseFilters,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { PollsService } from './polls.service';
 import { Namespace } from 'socket.io';
 import { SocketWithAuth } from './types';
+import { WsCatchAllFilter } from '../exceptions/ws-catch-all-filter';
 
 @UsePipes(new ValidationPipe())
+@UseFilters(new WsCatchAllFilter())
 @WebSocketGateway({
   namespace: 'polls',
 })
@@ -54,6 +61,6 @@ export class PollsGateway
 
   @SubscribeMessage('test')
   async test() {
-    throw new WsException({ field: 'field', message: 'You screwed up' });
+    throw new BadRequestException({ test: 'test' });
   }
 }
